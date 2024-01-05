@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:student2/pushnot/local_notifications.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class MyCalendarApp extends StatefulWidget {
@@ -115,6 +116,11 @@ class _MyCalendarAppState extends State<MyCalendarApp>
               ElevatedButton(
                 onPressed: () {
                   _addEventToDataSource();
+                  LocalNotifications.showSimpleNotification(
+                      title: "Shedule Notification",
+                      body: _eventController.text,
+                      payload:
+                          "$_selectedDateTime to ${_selectedDateTime.add(const Duration(hours: 2))}");
                   Navigator.of(context).pop();
                 },
                 child: Text('Add Event'),
@@ -129,7 +135,7 @@ class _MyCalendarAppState extends State<MyCalendarApp>
   _addEventToDataSource() {
     final newEvent = Appointment(
       startTime: _selectedDateTime,
-      endTime: _selectedDateTime.add(Duration(hours: 2)),
+      endTime: _selectedDateTime.add(const Duration(hours: 2)),
       subject: _eventController.text,
     );
 

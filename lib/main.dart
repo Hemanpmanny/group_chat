@@ -1,14 +1,39 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:student2/constraints.dart';
 import 'package:student2/firebase_options.dart';
 import 'package:student2/helper/helper_function.dart';
 import 'package:student2/pages/auth/login_page.dart';
 import 'package:student2/pages/home_page.dart';
+import 'package:student2/pdf.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:student2/pushnot/another.dart';
+import 'package:student2/pushnot/home.dart';
+import 'package:student2/pushnot/local_notifications.dart';
+
+import 'package:timezone/data/latest.dart' as tz;
+
+//import 'package:student2/push_notification/push_notification.dart';
+
+// Future _firebaseBackgroundMessage(RemoteMessage message) async {
+//   if (message.notification != null) {
+//     print("Some notification Received");
+//   }
+// }
+// final navigatorKey = GlobalKey<NavigatorState>();
+// FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//     FlutterLocalNotificationsPlugin();
+final navigatorKey = GlobalKey<NavigatorState>();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LocalNotifications.init();
 
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -21,6 +46,30 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // PushNotifications.init();
+    // FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundMessage);
+    // var initialNotification =
+    //     await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    // if (initialNotification?.didNotificationLaunchApp == true) {
+    //   // LocalNotifications.onClickNotification.stream.listen((event) {
+    //   Future.delayed(Duration(seconds: 1), () {
+    //     // print(event);
+    //     navigatorKey.currentState!.pushNamed('/another',
+    //         arguments: initialNotification?.notificationResponse?.payload);
+    //   });
+    // }
+
+//  handle in terminated state
+    var initialNotification =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    if (initialNotification?.didNotificationLaunchApp == true) {
+      // LocalNotifications.onClickNotification.stream.listen((event) {
+      Future.delayed(Duration(seconds: 1), () {
+        // print(event);
+        navigatorKey.currentState!.pushNamed('/another',
+            arguments: initialNotification?.notificationResponse?.payload);
+      });
+    }
   }
 
   runApp(const MyApp());
@@ -60,7 +109,11 @@ class _MyAppState extends State<MyApp> {
           scaffoldBackgroundColor: Colors.white),
       debugShowCheckedModeBanner: false,
       home: _isSignedIn ? const HomePage() : const LoginPage(),
-      // home: MyHomePage(title: 'Flutter Demo Home Page'),
+      //home: MyhomePage(title: 'Flutter Local Notifications'),
+      // routes: {
+      //   '/': (context) => const Homepage(),
+      //   '/another': (context) => const AnotherPage(),
+      // },
     );
   }
 }
