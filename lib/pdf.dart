@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  final String file;
+  MyHomePage({Key? key, required this.title, required this.file})
+      : super(key: key);
 
   final String title;
 
@@ -22,48 +18,78 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late PdfViewerController _pdfViewerController;
   final GlobalKey<SfPdfViewerState> _pdfViewerStateKey = GlobalKey();
+
   @override
   void initState() {
     _pdfViewerController = PdfViewerController();
     super.initState();
   }
 
+  Future<void> _downloadFile() async {
+    firebase_storage.Reference ref =
+        firebase_storage.FirebaseStorage.instance.ref(widget.file);
+
+    try {
+      final Directory appDirectory = await getApplicationDocumentsDirectory();
+      final String filePath = '${appDirectory.path}/${widget.file}';
+      File file = File(filePath);
+
+      await ref.writeToFile(file);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('File downloaded successfully'),
+        ),
+      );
+    } catch (e) {
+      print('Error downloading file: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      body: SfPdfViewer.network(
-          'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',
-          controller: _pdfViewerController,
-          key: _pdfViewerStateKey),
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
+      child: Scaffold(
+        body: SfPdfViewer.network(widget.file,
+            controller: _pdfViewerController, key: _pdfViewerStateKey),
+        appBar: AppBar(
+          actions: <Widget>[
+            IconButton(
               onPressed: () {
                 _pdfViewerStateKey.currentState!.openBookmarkView();
               },
               icon: Icon(
                 Icons.bookmark,
-                color: Colors.white,
-              )),
-          IconButton(
+                color: Colors.blue,
+              ),
+            ),
+            IconButton(
               onPressed: () {
                 _pdfViewerController.jumpToPage(5);
               },
               icon: Icon(
                 Icons.arrow_drop_down_circle,
-                color: Colors.white,
-              )),
-          IconButton(
+                color: Colors.blue,
+              ),
+            ),
+            IconButton(
               onPressed: () {
                 _pdfViewerController.zoomLevel = 1.25;
               },
               icon: Icon(
                 Icons.zoom_in,
-                color: Colors.white,
-              ))
-        ],
+                color: Colors.blue,
+              ),
+            ),
+            IconButton(
+              onPressed: _downloadFile,
+              icon: Icon(
+                Icons.download,
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

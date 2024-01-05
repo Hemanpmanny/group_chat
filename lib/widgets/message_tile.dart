@@ -5,6 +5,8 @@ import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:mime_type/mime_type.dart';
+import 'package:student2/pdf.dart';
+import 'package:student2/widgets/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
@@ -89,6 +91,7 @@ class _MessageTileState extends State<MessageTile> {
     if (fileURL == null) {
       return Container();
     }
+    print(widget.fileURL);
 
     final uri = Uri.parse(fileURL);
     final serverFilePath = uri.path;
@@ -122,28 +125,31 @@ class _MessageTileState extends State<MessageTile> {
         future: _downloadFile(fileURL),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Container(
-              height: 200,
-              child: LayoutBuilder(builder: (context, constraints) {
-                return InkWell(
-                  onTap: () async {
-                    if (await canLaunchUrl(Uri.parse(snapshot.data!))) {
-                      await launchUrl(Uri.parse(snapshot.data!));
-                    } else {
-                      throw 'Could not launch $snapshot.data';
-                    }
-                  },
-                  child: PDFView(
-                    filePath: snapshot.data,
-                    autoSpacing: true,
-                    pageSnap: true,
-                    swipeHorizontal: true,
-                  ),
-                );
-              }),
+            return GestureDetector(
+              onDoubleTap: () {
+                nextScreen(
+                    context, MyHomePage(title: 'flutter', file: fileURL));
+              },
+              child: Container(
+                height: 100,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return InkWell(
+                    child: PDFView(
+                      filePath: snapshot.data,
+                      autoSpacing: true,
+                      pageSnap: true,
+                      swipeHorizontal: true,
+                    ),
+                    onTap: () async {
+                      nextScreen(
+                          context, MyHomePage(title: 'flutter', file: fileURL));
+                    },
+                  );
+                }),
+              ),
             );
           } else {
-            return const CircularProgressIndicator();
+            return CircularProgressIndicator();
           }
         },
       );

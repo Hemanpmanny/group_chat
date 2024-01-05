@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:student2/calender.dart';
 import 'package:student2/helper/helper_function.dart';
 import 'package:student2/pages/auth/login_page.dart';
 import 'package:student2/pages/profile_page.dart';
@@ -71,6 +72,13 @@ class _HomePageState extends State<HomePage> {
               },
               icon: const Icon(
                 Icons.search,
+              )),
+          IconButton(
+              onPressed: () {
+                nextScreen(context, MyCalendarApp());
+              },
+              icon: const Icon(
+                Icons.calendar_month,
               ))
         ],
         elevation: 0,
