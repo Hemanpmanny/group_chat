@@ -123,9 +123,9 @@ class _MessageTileState extends State<MessageTile> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Container(
-              height: 300,
+              height: 200,
               child: LayoutBuilder(builder: (context, constraints) {
-                return GestureDetector(
+                return InkWell(
                   onTap: () async {
                     if (await canLaunchUrl(Uri.parse(snapshot.data!))) {
                       await launchUrl(Uri.parse(snapshot.data!));
